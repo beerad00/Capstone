@@ -1,0 +1,58 @@
+body{
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.527),rgba(0, 0, 0, 0.5)) ,url("/pub/images/productheader.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;  
+  background-size: cover;
+  background-color: gray;
+ 	}
+ 	#divId{
+ 		position: absolute;
+     top: 30%;
+     left: 38%;
+ 		display: flex;
+ 		flex-wrap: wrap;
+     flex-direction: column; 
+ 		align-items: center;
+ 		 justify-content: center;
+
+ 	}
+ 	#myformId{
+ 		background-color: gray;
+ 		width: 250px;
+ 		height: auto;
+ 		padding: 20px 30px;
+ 		border-radius: 5px;
+ 		margin: auto;
+ 	}
+
+ 	h5{
+ 		color: red;
+ 	}
+ 	
+ .carousel-control-prev,
+.carousel-control-next{
+    bottom: 90px;
+}
+
+.corouseldiv{
+  margin-left: 10px;
+  margin-right: 10px;
+  display: block;
+}
+.containerdiv {
+  border: 0;
+  float: left;
+  position: relative;
+  width: 300px;
+} 
+.cornerimage {
+  border: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+ } 
+ #imgstar{
+   max-width: 300px;
+ }
