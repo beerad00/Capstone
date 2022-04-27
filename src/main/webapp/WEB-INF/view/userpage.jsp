@@ -10,7 +10,7 @@
 <body>
 	
 <jsp:include page="../include/header.jsp" />
-<h1>Hi ${user.getName()}</h1>
+<center><h1>Hi ${user.getName()}</h1></center>
 
 <div class="m-4">
     <div class="card text-center">
@@ -30,7 +30,7 @@
         <div class="card-body">
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="home">
-                    <h5 class="card-title">${user.getName()}</h5>
+                    <h5 class="card-title">${user.getUsername()}</h5>
                     <div  class="m-4">
     <div class="card" style="margin-left: auto;margin-right: auto;width: 400px;">
         <img src="${user.getImagepath() }" width="75" height="230" class="w-100 border-bottom" >
@@ -80,7 +80,7 @@
 						<td>${product.getName()}</td>
 						<td>$${product.getPrice()}</td>
 						<td>${product.getDateadded()}</td>
-						<td>${product.getImagepath()}</td>
+						<td><img src="${product.getImagepath()}" height="42" width="42"/></td>
 						<td>${product.getSelleraccount().getUsername()}</td>
 						
 							<c:choose>
@@ -116,7 +116,7 @@
 						<td>${product.getName()}</td>
 						<td>$${product.getPrice()}</td>
 						<td>${product.getDateadded()}</td>
-						<td>${product.getImagepath()}</td>
+						<td><img src="${product.getImagepath()}" height="42" width="42"/></td>
 						<td><a href="/editProduct/${product.getId()}/1" ><i class="fa fa-pencil" aria-hidden="true"></i>Edit</a></td>
 						<td><a href="/deleteProduct/${product.getId()}/1"><i class="fa fa-trash" aria-hidden="true"></i>Delete</a></td>
 						</tr>

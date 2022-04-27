@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.teksystem.database.AccountDAO;
+
 import com.teksystem.database.MoneyAccountDAO;
 import com.teksystem.database.ProductDAO;
 import com.teksystem.database.ReviewDAO;
@@ -18,6 +19,7 @@ import com.teksystem.database.TagsDAO;
 import com.teksystem.formbean.ProductValidator;
 import com.teksystem.formbean.UserValidator;
 import com.teksystem.model.Account;
+
 import com.teksystem.model.MoneyAccount;
 import com.teksystem.model.Product;
 import com.teksystem.model.Review;
@@ -39,6 +41,7 @@ public class AccountService {
 	
 	@Autowired
 	MoneyAccountDAO mad;
+	
 	
 	
 	
@@ -118,7 +121,7 @@ public class AccountService {
 	{
 		return pd.findBybuyeraccount(account);
 	}
-	
+	//*****Related Items***********************//
 	public List<Product> getRelatedItems(Product prod)
 	{
 		
@@ -205,7 +208,7 @@ public class AccountService {
 		
 		
 	}
-	
+	//Makes List of Products for each tag
 	public List<Product> categoryList(String category)
 	{
 		
@@ -499,4 +502,9 @@ public class AccountService {
 	{
 		return pd.getSimilarName(query);
 	}
+	
+	
+	
+
+
 }

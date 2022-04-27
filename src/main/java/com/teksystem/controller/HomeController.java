@@ -39,7 +39,7 @@ import com.teksystem.model.Review;
 import com.teksystem.model.Tags;
 import com.teksystem.service.AccountService;
 
-import jdk.internal.org.jline.utils.Log;
+
 
 
 @Controller
@@ -63,24 +63,33 @@ public class HomeController {
 	@Autowired
 	AccountService service;
 	
-	
+	//Return Login Form
 	@RequestMapping(name="/", method=RequestMethod.GET)
 	public String home(Model m)
 	{
 		
 		return "login";
+		
 	}
-	
+	//Returns Product Form
 	@RequestMapping("/getProductForm")
 	public String getProductForm(Model m)
 	{
-		
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		return "productform";
 	}
-	
+	//Adds Product and checks if data is valid
 	@RequestMapping(value="/addProduct", method = RequestMethod.POST)
 	public String addProduct(Model m,@RequestParam(name="tags",required=false) String[] tagtest, @RequestParam(name="file",required = false) MultipartFile file, @Valid ProductValidator prod, BindingResult bindingresult) throws IOException
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
+		
 		String imagepath;
 		
 		if(file.getOriginalFilename().equals(""))
@@ -117,7 +126,7 @@ public class HomeController {
 		
 		return "redirect:/homePage";
 	}
-	
+	//Checks if user is in the database, and information entered is correct, otherwise returned to login form
 	@RequestMapping("/login")
 	public String login(Model m,@Valid LoginValidator login, BindingResult bindingresult)
 	{
@@ -134,11 +143,16 @@ public class HomeController {
 		m.addAttribute("user", mainuser);
 		return "redirect:/homePage";
 	}
-	
+	//MainPage/Home: Shows user their last 5 purchases, last 5 added to selling list, and streams reviews, at bottom of page
 	@RequestMapping("/homePage")
 	public String homePage(Model m)
 	{
+		
 		mainuser=service.retrieveAccountForLoggedInUser(mainuser.getUsername());
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		m.addAttribute("user", mainuser);
 		List<Product> sellinglist=service.retrieveUserSellingList(mainuser);
 		List<Product> buyinglist=service.retrieveUserBuyingList(mainuser);
@@ -165,7 +179,7 @@ public class HomeController {
 				
 		List<Review> avglist = service.getReviews(mainuser);
 		Double ans=avglist.stream().mapToDouble(d->d.getUserrating()).average().orElse(0.0);
-
+		
 		m.addAttribute("percentage", Math.round(ans*20));
 		
 
@@ -173,10 +187,15 @@ public class HomeController {
 		
 		return "userpage";
 	}
-	
+	//Return products list
 	@RequestMapping("/productList")
 	public String productList(Model m)
 	{
+		
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		List<Product> az = service.getAllProducts();
 		//A-Z
@@ -208,10 +227,14 @@ public class HomeController {
 		m.addAttribute("user", this.mainuser);
 		return "productlist";
 	}
-	
+	//Return List of sellers
 	@RequestMapping("/sellerList")
 	public String sellerList(Model m)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		List<Account> az = service.getAllSellers();
 		//A-Z
@@ -244,19 +267,27 @@ public class HomeController {
 		m.addAttribute("user", this.mainuser);
 		return "sellerlist";
 	}
-	
+	//Returns the edit product form (it takes page id so user can be directed to that page again once done editing)
 	@RequestMapping("/editProduct/{id}/{pageid}")
 	public String editProduct(Model m, @PathVariable("id") int id,@PathVariable("pageid") int pageid)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		m.addAttribute("product", service.retrieveProduct(id));
 		m.addAttribute("pageid", pageid);
 		return "editproduct";
 	}
-	
+	//Updates Product, and check if valid data is entered. Afterwards returns user back to the page they decided to edit on
 	@RequestMapping(value="/updateProduct", method=RequestMethod.POST)
 	public String updateProduct(Model m,@Valid ProductValidator prod,BindingResult bindingresult, @RequestParam(name="tags",required = false) String[] tagtest, @RequestParam(name="file",required = false) MultipartFile file, @RequestParam(name="pageid") int pageid) throws IOException
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		String imagepath;
 		
@@ -297,10 +328,15 @@ public class HomeController {
 		else
 			return "redirect:/productList";
 	}
-	
+	//Returns Product page where user see detailed information about the product
+	//User also has the ability to buy products, and see related items based on my algorithm
 	@RequestMapping(value="/productPage/{id}", method=RequestMethod.GET)
 	public String productPage(Model m,@PathVariable("id") int id)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		Product prod=service.retrieveProduct(id);
 		List<Product> relatedproducts = service.getRelatedItems(prod);
@@ -310,18 +346,16 @@ public class HomeController {
 		m.addAttribute("user", mainuser);
 		return "productpage";
 	}
+
 	
-	public String createForm(Model m, @RequestParam("id") int id)
-	{
-		
-		m.addAttribute("product", service.retrieveProduct(id));
-		return "formpage";
-	}
-	
-	
+	//Deletes only owned products by user, and returns them to page they were on previously
 	@RequestMapping(value="/deleteProduct/{id}/{pageid}", method=RequestMethod.GET)
 	public String deleteProduct(@PathVariable("id") int id,@PathVariable("pageid") int pageid)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		service.deleteProduct(id);
 		if(pageid==1)
 			return "redirect:/homePage";
@@ -330,11 +364,15 @@ public class HomeController {
 		return "redirect:/productList";
 		
 	}
-	
+	//Returns a Product List with all the tags a product can be given
+	//The user can click on the tags too see only products with the contained tags
 	@RequestMapping("/productCategoryPage")
 	public String getCategoryList(Model m, @RequestParam("producttagged") String tagged)
 	{
-		
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		List<Product> az = service.categoryList(tagged);
 		//A-Z
@@ -371,9 +409,16 @@ public class HomeController {
 		return "categorypage";
 	}
 	
+	//This method only runs when the user clicks the buy button
+	//Checks if the user has appropriate funds to make purchase
+	//If user doesn't have enough funds the buy button will disappear and user will be met with an error message
 	@RequestMapping(value="/purchaseProduct/{id}", method=RequestMethod.GET)
 	public String purchaseProduct(Model m, @PathVariable("id") int id)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		
 		MoneyAccount usermoney= service.getMoneyAccount(mainuser);
 		Product product = service.retrieveProduct(id);
@@ -394,24 +439,37 @@ public class HomeController {
 		return "redirect:/homePage";
 		
 	}
-	
+	//Returns a balance page where user can deposit money
 	@RequestMapping("/balancePage")
 	public String balancePage(Model m)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		m.addAttribute("money", service.getMoneyAccount(mainuser));
 		return "balancedeposit";
 	}
-	
+	//Send user to confirm page of what's deposited
+	//An audio loop of coins dropping plays when the page is ran
 	@RequestMapping("/confirmDeposit")
 	public String confirmDeposit(Model m, @RequestParam("deposit") double deposit)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		service.depositMoney(deposit, mainuser);
 		return "confirmdeposit";
 	}
-	
+	//Returns a list of all the products the user has purchased
 	@RequestMapping("/buyingPage")
 	public String buyingPage(Model m)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		List<Product> az = service.retrieveUserBuyingList(mainuser);
 		//A-Z
 		az.sort((a,b)->{return a.getName().compareTo(b.getName());});
@@ -442,17 +500,21 @@ public class HomeController {
 		m.addAttribute("user", this.mainuser);
 		return "buyingpage";
 	}
-	
+	//Return the a form for the user to create an account
 	@RequestMapping("/createUserForm")
 	public String getcreateUserForm(Model m)
 	{
 		
 		return "createuser";
 	}
-	
+	//
 	@RequestMapping(value="/reviewPage/{account}", method=RequestMethod.GET)
 	public String reviewPage(Model m,@PathVariable("account") String account)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		Account user = service.retrieveAccountForLoggedInUser(account);
 		
 		
@@ -485,10 +547,15 @@ public class HomeController {
 		
 		return "reviewpage";
 	}
-	
+	//Returns page for the seller, it's pretty similar to the user page but with less option such 
+	//You can the last 5 items put up, all the reviews, and the seller details such location, phone number, etc
 	@RequestMapping(value="/sellerPage/{account}", method=RequestMethod.GET)
 	public String sellerPage(Model m, @PathVariable("account") String account)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		Account user = service.retrieveAccountForLoggedInUser(account);
 		m.addAttribute("user", user);
 		m.addAttribute("sellinglist", service.retrieveUserSellingList(user));
@@ -499,7 +566,7 @@ public class HomeController {
 		m.addAttribute("percentage", Math.round(ans*20));
 		return "sellerpage";
 	}
-	
+	//Creates a new user, and checks if data is valid
 	@RequestMapping("/createNewUser")
 	public String createUser(Model m,@Valid UserValidator user,BindingResult bindingresult, @RequestParam(name="file",required = false) MultipartFile file) throws IOException
 	{
@@ -536,10 +603,14 @@ public class HomeController {
 		
 		return "login";
 	}
-	
+	//Edits User, and does Error Checking (Checks for Valid Input with form beans)
 	@RequestMapping("/editUser")
 	public String editUser(Model m,@RequestParam(name="file",required = false) MultipartFile file,@Valid UserValidator user,BindingResult bindingresult) throws IOException
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		String imagepath;
 		
 		if(file.getOriginalFilename().equals(""))
@@ -566,21 +637,26 @@ public class HomeController {
 		
 		return "redirect:/homePage";
 	}
-	
+	//Return review Form
 	@RequestMapping(value="/reviewForm/{productid}", method=RequestMethod.GET)
 	public String reviewForm(Model m,@PathVariable("productid") int id)
 	{
+		if (mainuser==null)
+		{
+			return "redirect:/logout";
+		}
 		m.addAttribute("product", service.retrieveProduct(id));
 		return "reviewform";
 	}
-	
+	//Creates New Review
 	@RequestMapping("/newReview")
 	public String newReview(@RequestParam("rating") int rating, @RequestParam("review") String review, @RequestParam("productid") int productid)
 	{
 		service.createNewReview(rating, review, productid);
 		return "redirect:/homePage";
 	}
-	
+	//Edits Account
+	//User is brought a visual of how their current profile looks while they're editing 
 	@RequestMapping("/editAccount/{account}")
 	public String editAccount(@PathVariable("account") String account,Model m)
 	{
@@ -588,25 +664,26 @@ public class HomeController {
 		m.addAttribute("user", user);
 		return "edituser";
 	}
-	
+	//Search Bar Function
+	//Depending on which radio button is selected, it'll search for products or sellers
 	@RequestMapping("/searchBar")
 	public String searchBar(Model m, @RequestParam("choice") int choice, @RequestParam("searchfor") String searchfor)
 	{
-		
+		//Searches for Product
 		if (choice == 2)
 		{
 			List<Product> az = service.searchProduct(searchfor);
-			//A-Z
+			
 			az.sort((a,b)->{return a.getName().compareTo(b.getName());});
 			
 			List<Product> za = service.searchProduct(searchfor);
-			//Z-A
+			
 			za.sort((a,b)->{return a.getName().compareTo(b.getName());});
 			Collections.reverse(za);
 			
 			
 			List<Product> dateasc=service.searchProduct(searchfor);
-			//Data oldest-newest
+			//Data oldest-new
 			dateasc.sort((a,b)->{return a.getDateadded().compareTo(b.getDateadded());});
 			
 			
@@ -625,27 +702,27 @@ public class HomeController {
 			m.addAttribute("user", this.mainuser);
 			return "searchproduct";
 		}
-		
+		//Searches for Account
 		else
 		{
 			List<Account> az = service.searchAccount(searchfor);
-			//A-Z
+			//Sorts A-Z
 			az.sort((a,b)->{return a.getName().compareTo(b.getName());});
 			
 			List<Account> za = service.searchAccount(searchfor);
-			//Z-A
+			//Sorts Z-A
 			za.sort((a,b)->{return a.getName().compareTo(b.getName());});
 			Collections.reverse(za);
 			
 			
 			List<Account> dateasc=service.searchAccount(searchfor);
-			//Data oldest-newest
+			//Sorts Date Oldest
 			dateasc.sort((a,b)->{return new Double(a.getRating()).compareTo(new Double(b.getRating()));});
 			
-			
+			//Sorts Date Newest
 			List<Account> datedsc=service.searchAccount(searchfor);
 			datedsc.sort((a,b)->{return new Double(a.getRating()).compareTo(new Double(b.getRating()));});
-			//Date newest-oldest
+			
 			Collections.reverse(datedsc);
 			
 			
@@ -661,6 +738,17 @@ public class HomeController {
 			return "searchaccount";
 		}
 	}
+	
+	@RequestMapping("/logout")
+	public String logout()
+	{
+		this.mainuser=null;
+		
+		return "logoutpage";
+	}
+	
+
+	
 	
 	
 }

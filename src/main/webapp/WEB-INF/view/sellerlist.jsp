@@ -139,7 +139,7 @@ body{
 </tr>
 </thead>
 <c:forEach var="seller" items="${datedsc}">
-<td><a href="/sellerPage/${seller.getUsername()}">${seller.getName()}</a></td>
+<td><a href="/sellerPage/${seller.getUsername()}">${seller.getUsername()}</a></td>
 <td>${seller.getRating()}</td>
 <td>${seller.getPhonenumber()}</td>
 <td>${seller.getLocation()}</td>
@@ -174,7 +174,7 @@ body{
 </tr>
 </thead>
 <c:forEach var="seller" items="${dateasc}">
-<td><a href="/sellerPage/${seller.getUsername()}">${seller.getName()}</a></td>
+<td><a href="/sellerPage/${seller.getUsername()}">${seller.getUsername()}</a></td>
 <td>${seller.getRating()}</td>
 <td>${seller.getPhonenumber()}</td>
 <td>${seller.getLocation()}</td>
@@ -211,7 +211,7 @@ body{
 </thead>
 <c:forEach var="seller" items="${az}">
 <tr>
-<td><a href="/sellerPage/${seller.getUsername()}">${seller.getName()}</a></td>
+<td><a href="/sellerPage/${seller.getUsername()}">${seller.getUsername()}</a></td>
 <td>${seller.getRating()}</td>
 <td>${seller.getPhonenumber()}</td>
 <td>${seller.getLocation()}</td>
@@ -247,7 +247,7 @@ body{
 </thead>
 <c:forEach var="seller" items="${za}">
 <tr>
-<td><a href="/sellerPage/${seller.getUsername()}">${seller.getName()}</a></td>
+<td><a href="/sellerPage/${seller.getUsername()}">${seller.getUsername()}</a></td>
 <td>${seller.getRating()}</td>
 <td>${seller.getPhonenumber()}</td>
 <td>${seller.getLocation()}</td>

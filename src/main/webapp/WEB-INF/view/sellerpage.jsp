@@ -89,7 +89,7 @@ body{
         <div class="card-body">
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="home">
-                    <h5 class="card-title">${user.getName()}</h5>
+                    <h5 class="card-title">${user.getUsername()}</h5>
                     <div  class="m-4">
     <div class="card" style="margin-left: auto;margin-right: auto;width: 400px;">
         <img src="${user.getImagepath()}" class="w-100 border-bottom" >
